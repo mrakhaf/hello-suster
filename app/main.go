@@ -11,6 +11,9 @@ import (
 	authHandler "github.com/mrakhaf/halo-suster/domain/auth/delivery/http"
 	authRepository "github.com/mrakhaf/halo-suster/domain/auth/repository"
 	authUsecase "github.com/mrakhaf/halo-suster/domain/auth/usecase"
+	nurseHandler "github.com/mrakhaf/halo-suster/domain/nurse/delivery/http"
+	nurseRepository "github.com/mrakhaf/halo-suster/domain/nurse/repository"
+	nurseUsecase "github.com/mrakhaf/halo-suster/domain/nurse/usecase"
 	"github.com/mrakhaf/halo-suster/shared/common"
 	formatJson "github.com/mrakhaf/halo-suster/shared/common/json"
 	"github.com/mrakhaf/halo-suster/shared/common/jwt"
@@ -60,6 +63,11 @@ func main() {
 	authRepo := authRepository.NewRepository(database)
 	authUsecase := authUsecase.NewUsecase(authRepo, jwtAccess)
 	authHandler.AuthHandler(publicGroup, authUsecase, authRepo, formatResponse)
+
+	//nurse
+	nurseRepo := nurseRepository.NewRepository(database)
+	nurseUsecase := nurseUsecase.NewUsecase(nurseRepo)
+	nurseHandler.HandlerNurse(restrictedGroup, nurseUsecase, nurseRepo, formatResponse)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", os.Getenv("APP_PORT"))))
 }
