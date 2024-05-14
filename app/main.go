@@ -44,7 +44,7 @@ func main() {
 	})
 
 	//create group
-	publicGroup := e.Group("/v1")
+	publicRoute := e.Group("/v1")
 
 	restrictedGroup := e.Group("/v1")
 	restrictedGroup.Use(middleware.JWTWithConfig(middleware.JWTConfig{
@@ -62,12 +62,12 @@ func main() {
 	//auth
 	authRepo := authRepository.NewRepository(database)
 	authUsecase := authUsecase.NewUsecase(authRepo, jwtAccess)
-	authHandler.AuthHandler(publicGroup, authUsecase, authRepo, formatResponse)
+	authHandler.AuthHandler(publicRoute, authUsecase, authRepo, formatResponse)
 
 	//nurse
 	nurseRepo := nurseRepository.NewRepository(database)
-	nurseUsecase := nurseUsecase.NewUsecase(nurseRepo)
-	nurseHandler.HandlerNurse(restrictedGroup, nurseUsecase, nurseRepo, formatResponse)
+	nurseUsecase := nurseUsecase.NewUsecase(nurseRepo, jwtAccess)
+	nurseHandler.HandlerNurse(restrictedGroup, publicRoute, nurseUsecase, nurseRepo, formatResponse, jwtAccess)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", os.Getenv("APP_PORT"))))
 }

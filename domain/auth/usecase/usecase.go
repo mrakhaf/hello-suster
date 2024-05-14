@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"errors"
+	"strconv"
 
 	"github.com/mrakhaf/halo-suster/domain/auth/interfaces"
 	"github.com/mrakhaf/halo-suster/models/request"
@@ -64,8 +65,10 @@ func (u *usecase) Login(req request.Login) (data interface{}, err error) {
 		return
 	}
 
+	NipString := strconv.Itoa(userIt.NIP)
+
 	//generate access token
-	accessToken, err := u.JwtAccess.GenerateToken(userIt.ID)
+	accessToken, err := u.JwtAccess.GenerateToken(NipString)
 
 	if err != nil {
 		err = errors.New("Generate access token failed")
