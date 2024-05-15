@@ -26,6 +26,7 @@ func HandlerMedicalRecord(privateRoute *echo.Group, publicRoute *echo.Group, use
 	}
 
 	privateRoute.POST("/medical/patient", handler.SaveMedicalRecord)
+	privateRoute.GET("/medical/patient", handler.GetMedicalRecord)
 }
 
 func (h *handlerMedicalRecord) SaveMedicalRecord(c echo.Context) error {
@@ -57,4 +58,30 @@ func (h *handlerMedicalRecord) SaveMedicalRecord(c echo.Context) error {
 
 	return h.formatResponse.FormatJson(c, http.StatusOK, "success", data)
 
+}
+
+func (h *handlerMedicalRecord) GetMedicalRecord(c echo.Context) error {
+	_, err := h.jwtAccess.GetUserIdFromToken(c)
+
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, "Unauthorized")
+	}
+
+	var req request.GetMedicalRecordParam
+
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	}
+
+	if err := c.Validate(req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	}
+
+	data, err := h.usecase.GetMedicalRecord(req)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return h.formatResponse.FormatJson(c, http.StatusOK, "success", data)
 }
