@@ -14,9 +14,9 @@ import (
 	medicalRecordHandler "github.com/mrakhaf/halo-suster/domain/medical-record/delivery/http"
 	medicalRecordRepository "github.com/mrakhaf/halo-suster/domain/medical-record/repository"
 	medicalRecordUsecase "github.com/mrakhaf/halo-suster/domain/medical-record/usecase"
-	nurseHandler "github.com/mrakhaf/halo-suster/domain/nurse/delivery/http"
-	nurseRepository "github.com/mrakhaf/halo-suster/domain/nurse/repository"
-	nurseUsecase "github.com/mrakhaf/halo-suster/domain/nurse/usecase"
+	UserHandler "github.com/mrakhaf/halo-suster/domain/user/delivery/http"
+	UserRepository "github.com/mrakhaf/halo-suster/domain/user/repository"
+	UserUsecase "github.com/mrakhaf/halo-suster/domain/user/usecase"
 	"github.com/mrakhaf/halo-suster/shared/common"
 	formatJson "github.com/mrakhaf/halo-suster/shared/common/json"
 	"github.com/mrakhaf/halo-suster/shared/common/jwt"
@@ -67,10 +67,10 @@ func main() {
 	authUsecase := authUsecase.NewUsecase(authRepo, jwtAccess)
 	authHandler.AuthHandler(publicRoute, authUsecase, authRepo, formatResponse)
 
-	//nurse
-	nurseRepo := nurseRepository.NewRepository(database)
-	nurseUsecase := nurseUsecase.NewUsecase(nurseRepo, jwtAccess)
-	nurseHandler.HandlerNurse(restrictedGroup, publicRoute, nurseUsecase, nurseRepo, formatResponse, jwtAccess)
+	//User
+	UserRepo := UserRepository.NewRepository(database)
+	UserUsecase := UserUsecase.NewUsecase(UserRepo, jwtAccess)
+	UserHandler.HandlerUser(restrictedGroup, publicRoute, UserUsecase, UserRepo, formatResponse, jwtAccess)
 
 	//medical-record
 	medicalRecordRepo := medicalRecordRepository.NewRepository(database)

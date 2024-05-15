@@ -27,3 +27,10 @@ type MedicalRecord struct {
 	IdentityCardScanImg string
 	CreatedAt           string
 }
+
+type Users struct {
+	ID        string `json:"userId"`
+	NIP       int    `json:"nip"`
+	Name      string `json:"name"`
+	CreatedAt string `json:"createdAt"`
+}
