@@ -108,10 +108,10 @@ func (repo *repoHandler) GetDataUsers(req request.GetUsers) (data []entity.Users
 	if req.Role != nil {
 		if *req.Role == "it" {
 			//query first 3 digit NIP is 615
-			query += fmt.Sprintf(" AND nip >= 6150000000000")
+			query += fmt.Sprintf(" AND cast(nip as text) like '615%%'")
 		} else if *req.Role == "nurse" {
 			//query first 3 digit NIP is 303
-			query += fmt.Sprintf(" AND nip >= 3030000000000")
+			query += fmt.Sprintf(" AND cast(nip as text) like '303%%'")
 		}
 	}
 
