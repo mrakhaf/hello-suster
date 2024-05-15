@@ -21,8 +21,8 @@ func NewUsecase(repository interfaces.Repository, jwtAccess *jwt.JWT) interfaces
 	}
 }
 
-func (u *usecase) SaveMedicalRecord(req request.SaveMedicalRecord) (data interface{}, err error) {
-	data, err = u.repository.SaveMedicalRecord(req)
+func (u *usecase) SavePatient(req request.SavePatient) (data interface{}, err error) {
+	data, err = u.repository.SavePatient(req)
 	if err != nil {
 		return
 	}
@@ -30,18 +30,18 @@ func (u *usecase) SaveMedicalRecord(req request.SaveMedicalRecord) (data interfa
 	return
 }
 
-func (u *usecase) GetMedicalRecord(req request.GetMedicalRecordParam) (data interface{}, err error) {
-	medicalRecord, err := u.repository.GetMedicalRecord(req)
+func (u *usecase) GetPatients(req request.GetPatientsParam) (data interface{}, err error) {
+	patient, err := u.repository.GetPatients(req)
 
 	if err != nil {
-		err = fmt.Errorf("error get medical record: %v", err)
+		err = fmt.Errorf("error get patients record: %v", err)
 		return
 	}
 
-	response := []dto.MedicalRecordResponse{}
+	response := []dto.PatientResponse{}
 
-	for _, data := range medicalRecord {
-		response = append(response, dto.MedicalRecordResponse{
+	for _, data := range patient {
+		response = append(response, dto.PatientResponse{
 			IdentityNumber: data.IdentityNumber,
 			PhoneNumber:    data.PhoneNumber,
 			Name:           data.Name,

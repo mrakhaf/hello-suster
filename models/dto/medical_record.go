@@ -1,6 +1,6 @@
 package dto
 
-type MedicalRecordResponse struct {
+type PatientResponse struct {
 	IdentityNumber int    `json:"identityNumber"`
 	PhoneNumber    string `json:"phoneNumber"`
 	Name           string `json:"name"`

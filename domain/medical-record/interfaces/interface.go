@@ -6,11 +6,11 @@ import (
 )
 
 type Repository interface {
-	SaveMedicalRecord(req request.SaveMedicalRecord) (data entity.MedicalRecord, err error)
-	GetMedicalRecord(req request.GetMedicalRecordParam) (data []entity.MedicalRecord, err error)
+	SavePatient(req request.SavePatient) (data entity.Patient, err error)
+	GetPatients(req request.GetPatientsParam) (data []entity.Patient, err error)
 }
 
 type Usecase interface {
-	SaveMedicalRecord(req request.SaveMedicalRecord) (data interface{}, err error)
-	GetMedicalRecord(req request.GetMedicalRecordParam) (data interface{}, err error)
+	SavePatient(req request.SavePatient) (data interface{}, err error)
+	GetPatients(req request.GetPatientsParam) (data interface{}, err error)
 }

@@ -17,7 +17,7 @@ type UserNurse struct {
 	CreatedAt           string
 }
 
-type MedicalRecord struct {
+type Patient struct {
 	ID                  string
 	IdentityNumber      int
 	PhoneNumber         string
