@@ -1,0 +1,8 @@
+CREATE TABLE medical_record (
+  id VARCHAR(255) PRIMARY KEY,
+  identityNumber VARCHAR(255) NOT NULL,
+  symptoms TEXT NOT NULL,
+  medications TEXT NOT NULL,
+  createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (id) REFERENCES patient(id)
+);
