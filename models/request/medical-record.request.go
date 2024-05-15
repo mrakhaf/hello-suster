@@ -8,3 +8,12 @@ type SaveMedicalRecord struct {
 	Gender                string `json:"gender" validate:"required"`
 	IdentityCardScanImage string `json:"identityCardScanImg" validate:"required,url"`
 }
+
+type GetMedicalRecordParam struct {
+	IdentityNumber *int    `query:"identityNumber" validate:"omitempty"`
+	Name           *string `query:"name" validate:"omitempty"`
+	PhoneNumber    *string `query:"phoneNumber" validate:"omitempty"`
+	CreatedAt      *string `query:"createdAt" validate:"omitempty"`
+	Limit          *int    `query:"limit" validate:"omitempty"`
+	Offset         *int    `query:"offset" validate:"omitempty"`
+}
