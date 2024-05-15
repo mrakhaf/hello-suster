@@ -22,9 +22,9 @@ func NewRepository(databaseDB *sql.DB) interfaces.Repository {
 	}
 }
 
-func (repo *repoHandler) SaveMedicalRecord(req request.SaveMedicalRecord) (data entity.MedicalRecord, err error) {
+func (repo *repoHandler) SavePatient(req request.SavePatient) (data entity.Patient, err error) {
 
-	data = entity.MedicalRecord{
+	data = entity.Patient{
 		ID:                  utils.GenerateUUID(),
 		IdentityNumber:      req.IdentityNumber,
 		PhoneNumber:         req.PhoneNumber,
@@ -35,7 +35,7 @@ func (repo *repoHandler) SaveMedicalRecord(req request.SaveMedicalRecord) (data 
 		CreatedAt:           time.Now().Format("2006-01-02 15:04:05"),
 	}
 
-	query := fmt.Sprintf("INSERT INTO medical_record (id, identitynumber, name, birthdate, phonenumber, gender, identityscanimage, created_at) VALUES ('%s', %d, '%s', '%s', '%s', '%s', '%s', '%s')", data.ID, data.IdentityNumber, data.Name, data.BirthDate, data.PhoneNumber, data.Gender, data.IdentityCardScanImg, data.CreatedAt)
+	query := fmt.Sprintf("INSERT INTO patient (id, identitynumber, name, birthdate, phonenumber, gender, identityscanimage, created_at) VALUES ('%s', %d, '%s', '%s', '%s', '%s', '%s', '%s')", data.ID, data.IdentityNumber, data.Name, data.BirthDate, data.PhoneNumber, data.Gender, data.IdentityCardScanImg, data.CreatedAt)
 
 	_, err = repo.databaseDB.Exec(query)
 
@@ -45,15 +45,15 @@ func (repo *repoHandler) SaveMedicalRecord(req request.SaveMedicalRecord) (data 
 			return
 		}
 
-		err = errors.New("Save medical record failed")
+		err = errors.New("Save patient failed")
 		return
 	}
 
 	return
 }
 
-func (repo *repoHandler) GetMedicalRecord(req request.GetMedicalRecordParam) (data []entity.MedicalRecord, err error) {
-	query := fmt.Sprintf("SELECT * FROM medical_record WHERE 1 = 1")
+func (repo *repoHandler) GetPatients(req request.GetPatientsParam) (data []entity.Patient, err error) {
+	query := fmt.Sprintf("SELECT * FROM patient WHERE 1 = 1")
 
 	if req.IdentityNumber != nil {
 		query += fmt.Sprintf(" AND identitynumber = %d", *req.IdentityNumber)
@@ -95,17 +95,17 @@ func (repo *repoHandler) GetMedicalRecord(req request.GetMedicalRecordParam) (da
 	rows, err := repo.databaseDB.Query(query)
 
 	if err != nil {
-		err = errors.New("Get medical record failed")
+		err = errors.New("Get patient failed")
 		return
 	}
 
 	defer rows.Close()
 
-	medical_record := entity.MedicalRecord{}
+	patients := entity.Patient{}
 
 	for rows.Next() {
-		err = rows.Scan(&medical_record.ID, &medical_record.IdentityNumber, &medical_record.Name, &medical_record.Gender, &medical_record.BirthDate, &medical_record.PhoneNumber, &medical_record.IdentityCardScanImg, &medical_record.CreatedAt)
-		data = append(data, medical_record)
+		err = rows.Scan(&patients.ID, &patients.IdentityNumber, &patients.Name, &patients.Gender, &patients.BirthDate, &patients.PhoneNumber, &patients.IdentityCardScanImg, &patients.CreatedAt)
+		data = append(data, patients)
 	}
 
 	return

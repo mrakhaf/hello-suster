@@ -1,6 +1,6 @@
 package request
 
-type SaveMedicalRecord struct {
+type SavePatient struct {
 	IdentityNumber        int    `json:"identityNumber" validate:"required"`
 	Name                  string `json:"name" validate:"required"`
 	BirthDate             string `json:"birthDate" validate:"required"`
@@ -9,7 +9,7 @@ type SaveMedicalRecord struct {
 	IdentityCardScanImage string `json:"identityCardScanImg" validate:"required,url"`
 }
 
-type GetMedicalRecordParam struct {
+type GetPatientsParam struct {
 	IdentityNumber *int    `query:"identityNumber" validate:"omitempty"`
 	Name           *string `query:"name" validate:"omitempty"`
 	PhoneNumber    *string `query:"phoneNumber" validate:"omitempty"`

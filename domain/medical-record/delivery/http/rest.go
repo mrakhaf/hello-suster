@@ -25,18 +25,18 @@ func HandlerMedicalRecord(privateRoute *echo.Group, publicRoute *echo.Group, use
 		jwtAccess:      jwtAccess,
 	}
 
-	privateRoute.POST("/medical/patient", handler.SaveMedicalRecord)
-	privateRoute.GET("/medical/patient", handler.GetMedicalRecord)
+	privateRoute.POST("/medical/patient", handler.SavePatient)
+	privateRoute.GET("/medical/patient", handler.GetPatients)
 }
 
-func (h *handlerMedicalRecord) SaveMedicalRecord(c echo.Context) error {
+func (h *handlerMedicalRecord) SavePatient(c echo.Context) error {
 	_, err := h.jwtAccess.GetUserIdFromToken(c)
 
 	if err != nil {
 		return c.JSON(http.StatusUnauthorized, "Unauthorized")
 	}
 
-	var req request.SaveMedicalRecord
+	var req request.SavePatient
 
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
@@ -46,7 +46,7 @@ func (h *handlerMedicalRecord) SaveMedicalRecord(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
-	data, err := h.usecase.SaveMedicalRecord(req)
+	data, err := h.usecase.SavePatient(req)
 
 	if err != nil && err.Error() == "Identity number already exist" {
 		return c.JSON(http.StatusConflict, map[string]string{"error": err.Error()})
@@ -60,14 +60,14 @@ func (h *handlerMedicalRecord) SaveMedicalRecord(c echo.Context) error {
 
 }
 
-func (h *handlerMedicalRecord) GetMedicalRecord(c echo.Context) error {
+func (h *handlerMedicalRecord) GetPatients(c echo.Context) error {
 	_, err := h.jwtAccess.GetUserIdFromToken(c)
 
 	if err != nil {
 		return c.JSON(http.StatusUnauthorized, "Unauthorized")
 	}
 
-	var req request.GetMedicalRecordParam
+	var req request.GetPatientsParam
 
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
@@ -77,7 +77,7 @@ func (h *handlerMedicalRecord) GetMedicalRecord(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
-	data, err := h.usecase.GetMedicalRecord(req)
+	data, err := h.usecase.GetPatients(req)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
