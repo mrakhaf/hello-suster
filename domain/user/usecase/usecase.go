@@ -4,7 +4,7 @@ import (
 	"errors"
 	"strconv"
 
-	"github.com/mrakhaf/halo-suster/domain/nurse/interfaces"
+	"github.com/mrakhaf/halo-suster/domain/user/interfaces"
 	"github.com/mrakhaf/halo-suster/models/request"
 	"github.com/mrakhaf/halo-suster/shared/common/jwt"
 	"github.com/mrakhaf/halo-suster/shared/utils"
@@ -93,6 +93,34 @@ func (u *usecase) LoginNurse(req request.Login) (data interface{}, err error) {
 		"name":        dataNurse.Name,
 		"accessToken": accessToken,
 	}
+
+	return
+
+}
+
+func (u *usecase) GetUsers(req request.GetUsers) (data interface{}, err error) {
+
+	data, err = u.repository.GetDataUsers(req)
+
+	if err != nil {
+		return
+	}
+
+	return
+
+}
+
+func (u *usecase) UpdateNurse(req request.EditNurse, nurseId string) (err error) {
+
+	err = u.repository.UpdateNurse(req, nurseId)
+
+	return
+
+}
+
+func (u *usecase) DeleteNurse(nurseId string) (err error) {
+
+	err = u.repository.DeleteNurse(nurseId)
 
 	return
 

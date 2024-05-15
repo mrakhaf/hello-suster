@@ -5,22 +5,22 @@ import (
 	"strconv"
 
 	"github.com/labstack/echo/v4"
-	"github.com/mrakhaf/halo-suster/domain/nurse/interfaces"
+	"github.com/mrakhaf/halo-suster/domain/user/interfaces"
 	"github.com/mrakhaf/halo-suster/models/request"
 	"github.com/mrakhaf/halo-suster/shared/common"
 	"github.com/mrakhaf/halo-suster/shared/common/jwt"
 	"github.com/mrakhaf/halo-suster/shared/utils"
 )
 
-type handlerNurse struct {
+type handlerUser struct {
 	usecase        interfaces.Usecase
 	repository     interfaces.Repository
 	formatResponse common.JSON
 	jwtAccess      *jwt.JWT
 }
 
-func HandlerNurse(privateRoute *echo.Group, publicRoute *echo.Group, usecase interfaces.Usecase, repository interfaces.Repository, formatResponse common.JSON, jwtAccess *jwt.JWT) {
-	handler := &handlerNurse{
+func HandlerUser(privateRoute *echo.Group, publicRoute *echo.Group, usecase interfaces.Usecase, repository interfaces.Repository, formatResponse common.JSON, jwtAccess *jwt.JWT) {
+	handler := &handlerUser{
 		usecase:        usecase,
 		repository:     repository,
 		formatResponse: formatResponse,
@@ -30,10 +30,13 @@ func HandlerNurse(privateRoute *echo.Group, publicRoute *echo.Group, usecase int
 	privateRoute.POST("/user/nurse/register", handler.Register)
 	privateRoute.POST("/user/nurse/:userId/access", handler.AccessNurse)
 	publicRoute.POST("/user/nurse/login", handler.LoginNurse)
+	privateRoute.GET("/user", handler.GetUsers)
+	privateRoute.PUT("/user/nurse/:userId", handler.EditNurse)
+	privateRoute.DELETE("/user/nurse/:userId", handler.DeleteNurse)
 
 }
 
-func (h *handlerNurse) Register(c echo.Context) error {
+func (h *handlerUser) Register(c echo.Context) error {
 
 	userId, err := h.jwtAccess.GetUserIdFromToken(c)
 
@@ -73,7 +76,7 @@ func (h *handlerNurse) Register(c echo.Context) error {
 	return h.formatResponse.FormatJson(c, http.StatusCreated, "Register success", data)
 }
 
-func (h *handlerNurse) AccessNurse(c echo.Context) error {
+func (h *handlerUser) AccessNurse(c echo.Context) error {
 
 	userId, err := h.jwtAccess.GetUserIdFromToken(c)
 
@@ -123,7 +126,7 @@ func (h *handlerNurse) AccessNurse(c echo.Context) error {
 
 }
 
-func (h *handlerNurse) LoginNurse(c echo.Context) error {
+func (h *handlerUser) LoginNurse(c echo.Context) error {
 	var req request.Login
 
 	if err := c.Bind(&req); err != nil {
@@ -140,12 +143,6 @@ func (h *handlerNurse) LoginNurse(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, "False NIP")
 	}
 
-	// 404 user is not found / user is not from nurse (nip not starts with 303)
-	// 	- `400` password is wrong
-	// - `400` user is not having access
-	// - `400` request doesn’t pass validation
-	// - `500` if server error
-
 	data, err := h.usecase.LoginNurse(req)
 	if err != nil && (err.Error() == "Wrong password" || err.Error() == "NIP not has access") {
 		return c.JSON(http.StatusBadRequest, "Wrong password // Not have access")
@@ -160,4 +157,115 @@ func (h *handlerNurse) LoginNurse(c echo.Context) error {
 	}
 
 	return h.formatResponse.FormatJson(c, http.StatusOK, "Login success", data)
+}
+
+func (h *handlerUser) GetUsers(c echo.Context) error {
+
+	userId, err := h.jwtAccess.GetUserIdFromToken(c)
+
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, "Unauthorized")
+	}
+
+	if userId[:3] != "615" {
+		return c.JSON(http.StatusUnauthorized, "Unauthorized")
+	}
+
+	var req request.GetUsers
+
+	if err := (&echo.DefaultBinder{}).BindQueryParams(c, &req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"message": err.Error()})
+	}
+
+	if err := c.Validate(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"message": err.Error()})
+	}
+
+	data, err := h.usecase.GetUsers(req)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+
+	return h.formatResponse.FormatJson(c, http.StatusOK, "success", data)
+}
+
+func (h *handlerUser) EditNurse(c echo.Context) error {
+
+	userId, err := h.jwtAccess.GetUserIdFromToken(c)
+
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, "Unauthorized")
+	}
+
+	if userId[:3] != "615" {
+		return c.JSON(http.StatusUnauthorized, "Unauthorized")
+	}
+
+	var req request.EditNurse
+
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, "bad request")
+	}
+
+	if err := c.Validate(req); err != nil {
+		return c.JSON(http.StatusBadRequest, "bad request")
+	}
+
+	nurseNipString := strconv.Itoa(req.NIP)
+
+	if nurseNipString[:3] != "303" {
+		return c.JSON(http.StatusNotFound, "bad request")
+	}
+
+	err = utils.ValidateNIP(req.NIP, "NURSE")
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "bad request")
+	}
+
+	nurseId := c.Param("userId")
+
+	err = h.usecase.UpdateNurse(req, nurseId)
+
+	if err != nil && err.Error() == "NIP already exist" {
+		return c.JSON(http.StatusConflict, "NIP already exist")
+	}
+
+	if err != nil && err.Error() == "UserId not found" {
+		return c.JSON(http.StatusNotFound, "UserId not found")
+	}
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+
+	return c.JSON(http.StatusOK, "success")
+}
+
+func (h *handlerUser) DeleteNurse(c echo.Context) error {
+
+	userId, err := h.jwtAccess.GetUserIdFromToken(c)
+
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, "Unauthorized")
+	}
+
+	if userId[:3] != "615" {
+		return c.JSON(http.StatusUnauthorized, "Unauthorized")
+	}
+
+	var userIdNurse = c.Param("userId")
+
+	err = h.usecase.DeleteNurse(userIdNurse)
+
+	if err != nil && err.Error() == "not delete anything" {
+		return c.JSON(http.StatusBadRequest, "not delete anything")
+	}
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+
+	return c.JSON(http.StatusOK, "success")
+
 }

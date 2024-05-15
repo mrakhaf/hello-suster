@@ -38,7 +38,7 @@ func (repo *repoHandler) SaveUserIt(req request.Register) (data entity.User, err
 		CreatedAt: time.Now().Format("2006-01-02 15:04:05"),
 	}
 
-	query := fmt.Sprintf("INSERT INTO user_it (id, nip, name, password, created_at) VALUES ('%s', %d, '%s', '%s', '%s')", data.ID, data.NIP, data.Name, data.Password, data.CreatedAt)
+	query := fmt.Sprintf("INSERT INTO users (id, nip, name, password, created_at) VALUES ('%s', %d, '%s', '%s', '%s')", data.ID, data.NIP, data.Name, data.Password, data.CreatedAt)
 
 	fmt.Println(query)
 
@@ -61,7 +61,7 @@ func (repo *repoHandler) SaveUserIt(req request.Register) (data entity.User, err
 
 func (repo *repoHandler) GetDataUserIt(nip int) (data entity.User, err error) {
 
-	query := fmt.Sprintf("SELECT * FROM user_it WHERE nip = %d", nip)
+	query := fmt.Sprintf("SELECT id, name, nip, password, created_at FROM users WHERE nip = %d", nip)
 
 	fmt.Println(query)
 
