@@ -11,6 +11,9 @@ import (
 	authHandler "github.com/mrakhaf/halo-suster/domain/auth/delivery/http"
 	authRepository "github.com/mrakhaf/halo-suster/domain/auth/repository"
 	authUsecase "github.com/mrakhaf/halo-suster/domain/auth/usecase"
+	medicalRecordHandler "github.com/mrakhaf/halo-suster/domain/medical-record/delivery/http"
+	medicalRecordRepository "github.com/mrakhaf/halo-suster/domain/medical-record/repository"
+	medicalRecordUsecase "github.com/mrakhaf/halo-suster/domain/medical-record/usecase"
 	nurseHandler "github.com/mrakhaf/halo-suster/domain/nurse/delivery/http"
 	nurseRepository "github.com/mrakhaf/halo-suster/domain/nurse/repository"
 	nurseUsecase "github.com/mrakhaf/halo-suster/domain/nurse/usecase"
@@ -68,6 +71,11 @@ func main() {
 	nurseRepo := nurseRepository.NewRepository(database)
 	nurseUsecase := nurseUsecase.NewUsecase(nurseRepo, jwtAccess)
 	nurseHandler.HandlerNurse(restrictedGroup, publicRoute, nurseUsecase, nurseRepo, formatResponse, jwtAccess)
+
+	//medical-record
+	medicalRecordRepo := medicalRecordRepository.NewRepository(database)
+	medicalRecordUsecase := medicalRecordUsecase.NewUsecase(medicalRecordRepo, jwtAccess)
+	medicalRecordHandler.HandlerMedicalRecord(restrictedGroup, publicRoute, medicalRecordUsecase, medicalRecordRepo, formatResponse, jwtAccess)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", os.Getenv("APP_PORT"))))
 }

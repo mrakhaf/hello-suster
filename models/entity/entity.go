@@ -16,3 +16,14 @@ type UserNurse struct {
 	IdentityCardScanImg string
 	CreatedAt           string
 }
+
+type MedicalRecord struct {
+	ID                  string
+	IdentityNumber      int
+	PhoneNumber         string
+	Name                string
+	BirthDate           string
+	Gender              string
+	IdentityCardScanImg string
+	CreatedAt           string
+}
