@@ -23,3 +23,12 @@ type GetPatientsParam struct {
 	Limit          *int    `query:"limit" validate:"omitempty"`
 	Offset         *int    `query:"offset" validate:"omitempty"`
 }
+
+type GetMedicalRecordsParam struct {
+	IdentityNumber *int    `query:"identityDetail.identityNumber" validate:"omitempty"`
+	UserId         *string `query:"createdBy.userId" validate:"omitempty"`
+	Nip            *string `query:"createdBy.nip" validate:"omitempty"`
+	Limit          *int    `query:"limit" validate:"omitempty"`
+	Offset         *int    `query:"offset" validate:"omitempty"`
+	CreatedAt      *string `query:"createdAt" validate:"omitempty"`
+}
