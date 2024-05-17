@@ -15,7 +15,13 @@ type Validator struct {
 
 func NewValidator() *Validator {
 	validate := validator.New()
-	err := validate.RegisterValidation("int_len", validateNumberOfDigit)
+	err := validate.RegisterValidation("min_len", validateMinLenInt)
+
+	if err != nil {
+		panic(err)
+	}
+
+	err = validate.RegisterValidation("max_len", validateMaxLenInt)
 
 	if err != nil {
 		panic(err)
@@ -34,7 +40,7 @@ func (v *Validator) Validate(i interface{}) error {
 	return nil
 }
 
-func validateNumberOfDigit(fl validator.FieldLevel) bool {
+func validateMinLenInt(fl validator.FieldLevel) bool {
 	field := fl.Field()
 	param, err := strconv.Atoi(fl.Param())
 	if err != nil {
@@ -51,5 +57,25 @@ func validateNumberOfDigit(fl validator.FieldLevel) bool {
 		n += 1
 	}
 
-	return n == param
+	return n >= param
+}
+
+func validateMaxLenInt(fl validator.FieldLevel) bool {
+	field := fl.Field()
+	param, err := strconv.Atoi(fl.Param())
+	if err != nil {
+		panic(err.Error())
+	}
+
+	v := field.Int()
+	if v < 0 {
+		panic("negative number")
+	}
+
+	n := 0
+	for ; v > 0; v /= 10 {
+		n += 1
+	}
+
+	return n <= param
 }
