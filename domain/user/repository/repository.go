@@ -117,9 +117,9 @@ func (repo *repoHandler) GetDataUsers(req request.GetUsers) (data []entity.Users
 
 	if req.CreatedAt != nil {
 		if *req.CreatedAt == "asc" {
-			query += fmt.Sprintf(" ORDER BY nip ASC")
+			query += fmt.Sprintf(" ORDER BY created_at ASC")
 		} else if *req.CreatedAt == "desc" {
-			query += fmt.Sprintf(" ORDER BY nip DESC")
+			query += fmt.Sprintf(" ORDER BY created_at DESC")
 		}
 	}
 
