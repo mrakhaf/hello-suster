@@ -9,6 +9,12 @@ type SavePatient struct {
 	IdentityCardScanImage string `json:"identityCardScanImg" validate:"required,url"`
 }
 
+type SaveMedicalRecord struct {
+	IdentityNumber int    `json:"identityNumber" validate:"required"`
+	Symptoms       string `json:"symptoms" validate:"required"`
+	Medications    string `json:"medications" validate:"required"`
+}
+
 type GetPatientsParam struct {
 	IdentityNumber *int    `query:"identityNumber" validate:"omitempty"`
 	Name           *string `query:"name" validate:"omitempty"`
