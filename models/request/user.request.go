@@ -2,7 +2,7 @@ package request
 
 type RegisterNurse struct {
 	Name                  string `json:"name" validate:"required,min=5,max=50"`
-	NIP                   int    `json:"nip" validate:"required,int_len=13"`
+	NIP                   int    `json:"nip" validate:"required,min_len=13,max_len=15"`
 	IdentityCardScanImage string `json:"identityCardScanImg" validate:"required,url"`
 }
 
@@ -22,5 +22,5 @@ type GetUsers struct {
 
 type EditNurse struct {
 	Name string `json:"name" validate:"required,min=5,max=50"`
-	NIP  int    `json:"nip" validate:"required,int_len=13"`
+	NIP  int    `json:"nip" validate:"required,min_len=13,max_len=15"`
 }
