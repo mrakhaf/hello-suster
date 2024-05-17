@@ -28,6 +28,14 @@ type Patient struct {
 	CreatedAt           string
 }
 
+type MedicalRecord struct {
+	ID             string
+	IdentityNumber int
+	Symptoms       string
+	Medications    string
+	CreatedAt      string
+}
+
 type Users struct {
 	ID        string `json:"userId"`
 	NIP       int    `json:"nip"`

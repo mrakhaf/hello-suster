@@ -6,9 +6,3 @@ CREATE TABLE users (
     identityscanimage VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
-
-CREATE INDEX IF NOT EXISTS index_name
-	ON user USING(lower(name));
-
-CREATE INDEX index_nip_string ON user CAST(nip AS VARCHAR);    
