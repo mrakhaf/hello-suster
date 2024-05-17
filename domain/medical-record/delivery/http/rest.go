@@ -27,6 +27,7 @@ func HandlerMedicalRecord(privateRoute *echo.Group, publicRoute *echo.Group, use
 
 	privateRoute.POST("/medical/patient", handler.SavePatient)
 	privateRoute.GET("/medical/patient", handler.GetPatients)
+	privateRoute.POST("/medical/record", handler.SaveMedicalRecord)
 }
 
 func (h *handlerMedicalRecord) SavePatient(c echo.Context) error {
@@ -84,4 +85,33 @@ func (h *handlerMedicalRecord) GetPatients(c echo.Context) error {
 	}
 
 	return h.formatResponse.FormatJson(c, http.StatusOK, "success", data)
+}
+
+func (h *handlerMedicalRecord) SaveMedicalRecord(c echo.Context) error {
+	_, err := h.jwtAccess.GetUserIdFromToken(c)
+
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, "Unauthorized")
+	}
+
+	var req request.SaveMedicalRecord
+
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	}
+
+	if err := c.Validate(req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	}
+
+	data, err := h.usecase.SaveMedicalRecord(req)
+
+	if err != nil {
+		if err.Error() == "Identity not found" {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		}
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return h.formatResponse.FormatJson(c, http.StatusCreated, "success", data)
 }
