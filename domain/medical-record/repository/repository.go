@@ -126,7 +126,7 @@ func (repo *repoHandler) GetPatients(req request.GetPatientsParam) (data []entit
 	return
 }
 
-func (repo *repoHandler) SaveMedicalRecord(req request.SaveMedicalRecord) (data entity.MedicalRecord, err error) {
+func (repo *repoHandler) SaveMedicalRecord(req request.SaveMedicalRecord, nip int) (data entity.MedicalRecord, err error) {
 	data = entity.MedicalRecord{
 		ID:             utils.GenerateUUID(),
 		IdentityNumber: req.IdentityNumber,
@@ -135,8 +135,9 @@ func (repo *repoHandler) SaveMedicalRecord(req request.SaveMedicalRecord) (data 
 		CreatedAt:      time.Now().Format("2006-01-02 15:04:05"),
 	}
 
-	query := fmt.Sprintf("INSERT INTO medical_record (id, identitynumber, symptoms, medications, createdat) VALUES ('%s', %d, '%s', '%s', '%s')", data.ID, data.IdentityNumber, data.Symptoms, data.Medications, data.CreatedAt)
+	query := fmt.Sprintf("INSERT INTO medical_record (id, identitynumber, symptoms, medications, nip, createdat) VALUES ('%s', %d, '%s', '%s', '%d', '%s')", data.ID, data.IdentityNumber, data.Symptoms, data.Medications, nip, data.CreatedAt)
 
+	fmt.Println(query)
 	_, err = repo.databaseDB.Exec(query)
 
 	fmt.Println(err)
@@ -152,7 +153,7 @@ func (repo *repoHandler) GetMedicalRecords(req request.GetMedicalRecordsParam) (
 	query := fmt.Sprintf("SELECT p.identitynumber, p.phonenumber, p.name, p.gender, p.birthdate, p.identityscanimage, mr.symptoms, " +
 		"mr.medications, mr.createdat, u.nip, u.name, u.id FROM medical_record mr " +
 		"JOIN patient p ON mr.identitynumber = p.identitynumber " +
-		"JOIN users u ON mr.userid = u.id  WHERE 1 = 1")
+		"JOIN users u ON mr.nip = u.nip WHERE 1 = 1")
 
 	if req.IdentityNumber != nil {
 		query += fmt.Sprintf(" AND p.identitynumber = %d", *req.IdentityNumber)
@@ -175,11 +176,7 @@ func (repo *repoHandler) GetMedicalRecords(req request.GetMedicalRecordsParam) (
 	}
 
 	if req.Limit != nil {
-		if *req.Limit > 5 {
-			query += fmt.Sprintf(" LIMIT %d", *req.Limit)
-		} else {
-			query += fmt.Sprintf(" LIMIT 5")
-		}
+		query += fmt.Sprintf(" LIMIT %d", *req.Limit)
 	} else {
 		query += fmt.Sprintf(" LIMIT 5")
 	}
@@ -190,6 +187,7 @@ func (repo *repoHandler) GetMedicalRecords(req request.GetMedicalRecordsParam) (
 		query += fmt.Sprintf(" OFFSET 0")
 	}
 
+	fmt.Println(query)
 	rows, err := repo.databaseDB.Query(query)
 
 	if err != nil {
