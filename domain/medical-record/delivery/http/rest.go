@@ -67,7 +67,7 @@ func (h *handlerMedicalRecord) SavePatient(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	return h.formatResponse.FormatJson(c, http.StatusOK, "success", data)
+	return h.formatResponse.FormatJson(c, http.StatusCreated, "success", data)
 
 }
 
