@@ -1,6 +1,7 @@
 package http
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -39,6 +40,8 @@ func HandlerUser(privateRoute *echo.Group, publicRoute *echo.Group, usecase inte
 func (h *handlerUser) Register(c echo.Context) error {
 
 	userId, err := h.jwtAccess.GetUserIdFromToken(c)
+
+	fmt.Println(userId)
 
 	if err != nil {
 		return c.JSON(http.StatusUnauthorized, "Unauthorized")

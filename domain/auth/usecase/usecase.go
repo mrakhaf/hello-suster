@@ -32,7 +32,9 @@ func (u *usecase) Register(req request.Register) (data interface{}, err error) {
 		return
 	}
 
-	accessToken, err := u.JwtAccess.GenerateToken(userIt.ID)
+	NipString := strconv.Itoa(userIt.NIP)
+
+	accessToken, err := u.JwtAccess.GenerateToken(NipString)
 
 	if err != nil {
 		err = errors.New("Generate access token failed")
