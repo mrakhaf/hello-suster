@@ -50,7 +50,7 @@ func (repo *repoHandler) SaveUserNurse(req request.RegisterNurse) (data entity.U
 	return
 }
 
-func (repo *repoHandler) AddAccessNurse(password string, nurseIdInt int) (err error) {
+func (repo *repoHandler) AddAccessNurse(password string, nurseId string) (err error) {
 
 	password, err = utils.HashPassword(password)
 
@@ -58,11 +58,23 @@ func (repo *repoHandler) AddAccessNurse(password string, nurseIdInt int) (err er
 		return
 	}
 
-	queryUpdate := fmt.Sprintf("UPDATE users SET password = '%s' WHERE nip = %d", password, nurseIdInt)
+	queryUpdate := fmt.Sprintf("UPDATE users SET password = '%s' WHERE id = '%s' and cast(nip as text) like '303%%'", password, nurseId)
 
-	_, err = repo.databaseDB.Exec(queryUpdate)
+	sqlResult, err := repo.databaseDB.Exec(queryUpdate)
 
 	if err != nil {
+		return
+	}
+
+	rows, err := sqlResult.RowsAffected()
+
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+
+	if rows == 0 {
+		err = errors.New("UserId not found / nip not nurse")
 		return
 	}
 
