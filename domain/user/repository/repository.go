@@ -165,7 +165,7 @@ func (repo *repoHandler) GetDataUsers(req request.GetUsers) (data []entity.Users
 
 func (repo *repoHandler) UpdateNurse(req request.EditNurse, nurseId string) (err error) {
 
-	query := fmt.Sprintf("UPDATE users SET name = '%s', nip = %d WHERE id = '%s'", req.Name, req.NIP, nurseId)
+	query := fmt.Sprintf("UPDATE users SET name = '%s', nip = %d WHERE id = '%s' and cast(nip as text) like '303%%'", req.Name, req.NIP, nurseId)
 
 	fmt.Println(query)
 
