@@ -114,7 +114,7 @@ func (repo *repoHandler) GetDataUsers(req request.GetUsers) (data []entity.Users
 	}
 
 	if req.Name != nil {
-		query += fmt.Sprintf(" AND name like '%s%%'", *req.Name)
+		query += fmt.Sprintf(" AND name like '%%%s%%'", *req.Name)
 	}
 
 	if req.Role != nil {
