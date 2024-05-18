@@ -3,6 +3,7 @@ package http
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 	"github.com/mrakhaf/halo-suster/domain/medical-record/interfaces"
@@ -98,7 +99,7 @@ func (h *handlerMedicalRecord) GetPatients(c echo.Context) error {
 }
 
 func (h *handlerMedicalRecord) SaveMedicalRecord(c echo.Context) error {
-	_, err := h.jwtAccess.GetUserIdFromToken(c)
+	nipString, err := h.jwtAccess.GetUserIdFromToken(c)
 
 	if err != nil {
 		return c.JSON(http.StatusUnauthorized, "Unauthorized")
@@ -114,11 +115,13 @@ func (h *handlerMedicalRecord) SaveMedicalRecord(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
-	data, err := h.usecase.SaveMedicalRecord(req)
+	nipInt, _ := strconv.Atoi(nipString)
+
+	data, err := h.usecase.SaveMedicalRecord(req, nipInt)
 
 	if err != nil {
 		if err.Error() == "Identity not found" {
-			return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+			return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 		}
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}

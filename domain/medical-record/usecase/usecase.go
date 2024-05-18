@@ -56,14 +56,14 @@ func (u *usecase) GetPatients(req request.GetPatientsParam) (data interface{}, e
 	return
 }
 
-func (u *usecase) SaveMedicalRecord(req request.SaveMedicalRecord) (data interface{}, err error) {
+func (u *usecase) SaveMedicalRecord(req request.SaveMedicalRecord, nip int) (data interface{}, err error) {
 	_, err = u.repository.GetPatientByIdentity(req.IdentityNumber)
 
 	if err != nil {
 		return
 	}
 
-	data, err = u.repository.SaveMedicalRecord(req)
+	data, err = u.repository.SaveMedicalRecord(req, nip)
 	if err != nil {
 		return
 	}

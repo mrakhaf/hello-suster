@@ -10,9 +10,9 @@ type SavePatient struct {
 }
 
 type SaveMedicalRecord struct {
-	IdentityNumber int    `json:"identityNumber" validate:"required"`
-	Symptoms       string `json:"symptoms" validate:"required"`
-	Medications    string `json:"medications" validate:"required"`
+	IdentityNumber int    `json:"identityNumber" validate:"required,min_len=16,max_len=16"`
+	Symptoms       string `json:"symptoms" validate:"required,min=1,max=2000"`
+	Medications    string `json:"medications" validate:"required,min=1,max=2000"`
 }
 
 type GetPatientsParam struct {
