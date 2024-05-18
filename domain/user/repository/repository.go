@@ -124,11 +124,7 @@ func (repo *repoHandler) GetDataUsers(req request.GetUsers) (data []entity.Users
 	}
 
 	if req.Limit != nil {
-		if *req.Limit > 5 {
-			query += fmt.Sprintf(" LIMIT %d", *req.Limit)
-		} else {
-			query += fmt.Sprintf(" LIMIT 5")
-		}
+		query += fmt.Sprintf(" LIMIT %d", *req.Limit)
 	} else {
 		query += fmt.Sprintf(" LIMIT 5")
 	}
