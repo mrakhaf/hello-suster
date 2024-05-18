@@ -1,6 +1,7 @@
 package http
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -8,6 +9,7 @@ import (
 	"github.com/mrakhaf/halo-suster/models/request"
 	"github.com/mrakhaf/halo-suster/shared/common"
 	"github.com/mrakhaf/halo-suster/shared/common/jwt"
+	"github.com/mrakhaf/halo-suster/shared/utils"
 )
 
 type handlerMedicalRecord struct {
@@ -48,6 +50,12 @@ func (h *handlerMedicalRecord) SavePatient(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
+	isImageTrue := utils.CheckImageType(req.IdentityCardScanImage)
+
+	if !isImageTrue {
+		return c.JSON(http.StatusBadRequest, "bad request")
+	}
+
 	data, err := h.usecase.SavePatient(req)
 
 	if err != nil && err.Error() == "Identity number already exist" {
@@ -55,6 +63,7 @@ func (h *handlerMedicalRecord) SavePatient(c echo.Context) error {
 	}
 
 	if err != nil {
+		fmt.Println(err.Error())
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
