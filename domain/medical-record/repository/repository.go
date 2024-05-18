@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/mrakhaf/halo-suster/domain/medical-record/interfaces"
+	"github.com/mrakhaf/halo-suster/models/dto"
 	"github.com/mrakhaf/halo-suster/models/entity"
 	"github.com/mrakhaf/halo-suster/models/request"
 	"github.com/mrakhaf/halo-suster/shared/utils"
@@ -146,6 +147,85 @@ func (repo *repoHandler) SaveMedicalRecord(req request.SaveMedicalRecord) (data 
 	if err != nil {
 		err = errors.New("Save medical record failed")
 		return
+	}
+
+	return
+}
+
+func (repo *repoHandler) GetMedicalRecords(req request.GetMedicalRecordsParam) (data []dto.MedicalRecordResponse, err error) {
+	query := fmt.Sprintf("SELECT p.identitynumber, p.phonenumber, p.name, p.gender, p.birthdate, p.identityscanimage, mr.symptoms, " +
+		"mr.medications, mr.createdat, u.nip, u.name, u.id FROM medical_record mr " +
+		"JOIN patient p ON mr.identitynumber = p.identitynumber " +
+		"JOIN users u ON mr.userid = u.id  WHERE 1 = 1")
+
+	if req.IdentityNumber != nil {
+		query += fmt.Sprintf(" AND p.identitynumber = %d", *req.IdentityNumber)
+	}
+
+	if req.UserId != nil {
+		query += fmt.Sprintf(" AND u.id = '%s'", *req.UserId)
+	}
+
+	if req.Nip != nil {
+		query += fmt.Sprintf(" AND u.nip = '%s'", *req.Nip)
+	}
+
+	if req.CreatedAt != nil {
+		if *req.CreatedAt == "asc" {
+			query += " ORDER BY createdat ASC"
+		} else if *req.CreatedAt == "desc" {
+			query += " ORDER BY createdat DESC"
+		}
+	}
+
+	if req.Limit != nil {
+		if *req.Limit > 5 {
+			query += fmt.Sprintf(" LIMIT %d", *req.Limit)
+		} else {
+			query += fmt.Sprintf(" LIMIT 5")
+		}
+	} else {
+		query += fmt.Sprintf(" LIMIT 5")
+	}
+
+	if req.Offset != nil {
+		query += fmt.Sprintf(" OFFSET %d", *req.Offset)
+	} else {
+		query += fmt.Sprintf(" OFFSET 0")
+	}
+
+	rows, err := repo.databaseDB.Query(query)
+
+	if err != nil {
+		err = errors.New("Get medical record failed")
+		return
+	}
+
+	defer rows.Close()
+
+	patient := entity.Patient{}
+	users := entity.Users{}
+	medicalRecords := entity.MedicalRecord{}
+
+	for rows.Next() {
+		err = rows.Scan(&patient.IdentityNumber, &patient.Name, &patient.PhoneNumber, &patient.Gender, &patient.BirthDate, &patient.IdentityCardScanImg, &medicalRecords.Symptoms, &medicalRecords.Medications, &medicalRecords.CreatedAt, &users.NIP, &users.Name, &users.ID)
+
+		data = append(data, dto.MedicalRecordResponse{
+			IdentityDetail: dto.IdentityDetail{
+				IdentityNumber: patient.IdentityNumber,
+				PhoneNumber:    patient.PhoneNumber,
+				Name:           patient.Name,
+				BirthDate:      patient.BirthDate,
+			},
+			Symptoms:    medicalRecords.Symptoms,
+			Medications: medicalRecords.Medications,
+			CreatedAt:   medicalRecords.CreatedAt,
+			CreatedBy: dto.CreatedBy{
+				UserId: users.ID,
+				Name:   users.Name,
+				Nip:    users.NIP,
+			},
+		})
 	}
 
 	return

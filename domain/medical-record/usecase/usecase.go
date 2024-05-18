@@ -70,3 +70,37 @@ func (u *usecase) SaveMedicalRecord(req request.SaveMedicalRecord) (data interfa
 
 	return
 }
+
+func (u *usecase) GetMedicalRecords(req request.GetMedicalRecordsParam) (data interface{}, err error) {
+	medicalRecords, err := u.repository.GetMedicalRecords(req)
+
+	if err != nil {
+		err = fmt.Errorf("error get medical records: %v", err)
+		return
+	}
+
+	response := []dto.MedicalRecordResponse{}
+
+	for _, data := range medicalRecords {
+		response = append(response, dto.MedicalRecordResponse{
+			IdentityDetail: dto.IdentityDetail{
+				IdentityNumber: data.IdentityDetail.IdentityNumber,
+				PhoneNumber:    data.IdentityDetail.PhoneNumber,
+				Name:           data.IdentityDetail.Name,
+				BirthDate:      data.IdentityDetail.BirthDate,
+			},
+			Symptoms:    data.Symptoms,
+			Medications: data.Medications,
+			CreatedBy: dto.CreatedBy{
+				UserId: data.CreatedBy.UserId,
+				Nip:    data.CreatedBy.Nip,
+				Name:   data.CreatedBy.Name,
+			},
+			CreatedAt: data.CreatedAt,
+		})
+	}
+
+	data = response
+
+	return
+}
