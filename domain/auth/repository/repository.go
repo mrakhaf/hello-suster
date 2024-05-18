@@ -46,7 +46,8 @@ func (repo *repoHandler) SaveUserIt(req request.Register) (data entity.User, err
 
 	if err != nil {
 		// if err duplicate nip
-		if err.Error() == "pq: duplicate key value violates unique constraint \"user_it_nip_key\"" {
+		fmt.Println(err.Error())
+		if err.Error() == "pq: duplicate key value violates unique constraint \"users_nip_key\"" {
 			err = errors.New("NIP already exist")
 			return
 		}
