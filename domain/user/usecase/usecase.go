@@ -100,11 +100,18 @@ func (u *usecase) LoginNurse(req request.Login) (data interface{}, err error) {
 
 func (u *usecase) GetUsers(req request.GetUsers) (data interface{}, err error) {
 
-	data, err = u.repository.GetDataUsers(req)
+	dataUsers, err := u.repository.GetDataUsers(req)
 
 	if err != nil {
 		return
 	}
+
+	if len(dataUsers) == 0 {
+		data = []interface{}{}
+		return
+	}
+
+	data = dataUsers
 
 	return
 
