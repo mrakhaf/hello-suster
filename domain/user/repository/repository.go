@@ -220,3 +220,26 @@ func (repo *repoHandler) DeleteNurse(nurseId string) (err error) {
 	return
 
 }
+
+func (repo *repoHandler) GetUserByID(id string) (data entity.Users, err error) {
+
+	query := fmt.Sprintf("SELECT id, name, nip, created_at FROM users WHERE id = '%s'", id)
+
+	fmt.Println(query)
+
+	err = repo.databaseDB.QueryRow(query).Scan(&data.ID, &data.Name, &data.NIP, &data.CreatedAt)
+
+	if err != nil {
+
+		if err == sql.ErrNoRows {
+			err = errors.New("UserId not found")
+			return
+		}
+
+		fmt.Println(err.Error())
+		err = errors.New("Get data failed")
+		return
+	}
+
+	return
+}

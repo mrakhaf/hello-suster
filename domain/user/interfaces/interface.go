@@ -12,6 +12,7 @@ type Repository interface {
 	GetDataUsers(req request.GetUsers) (data []entity.Users, err error)
 	UpdateNurse(req request.EditNurse, nurseId string) (err error)
 	DeleteNurse(nurseId string) (err error)
+	GetUserByID(id string) (data entity.Users, err error)
 }
 
 type Usecase interface {
