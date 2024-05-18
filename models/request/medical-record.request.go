@@ -1,7 +1,7 @@
 package request
 
 type SavePatient struct {
-	IdentityNumber        int    `json:"identityNumber" validate:"required"`
+	IdentityNumber        int    `json:"identityNumber" validate:"required,min_len=16,max_len=16"`
 	Name                  string `json:"name" validate:"required"`
 	BirthDate             string `json:"birthDate" validate:"required"`
 	PhoneNumber           string `json:"phoneNumber" validate:"required"`
