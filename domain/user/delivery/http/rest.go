@@ -256,7 +256,7 @@ func (h *handlerUser) DeleteNurse(c echo.Context) error {
 	err = h.usecase.DeleteNurse(userIdNurse)
 
 	if err != nil && err.Error() == "not delete anything" {
-		return c.JSON(http.StatusBadRequest, "not delete anything")
+		return c.JSON(http.StatusNotFound, "not delete anything")
 	}
 
 	if err != nil {
