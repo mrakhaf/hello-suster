@@ -40,15 +40,15 @@ func (u *usecase) Register(req request.RegisterNurse) (data interface{}, err err
 
 }
 
-func (u *usecase) GiveAccessNurse(password string, nurseIdInt int) (err error) {
+func (u *usecase) GiveAccessNurse(password string, nurseId string) (err error) {
 
-	_, err = u.repository.GetNurseByNIP(nurseIdInt)
+	// _, err = u.repository.GetUserByID(nurseId)
 
-	if err != nil {
-		return
-	}
+	// if err != nil {
+	// 	return
+	// }
 
-	err = u.repository.AddAccessNurse(password, nurseIdInt)
+	err = u.repository.AddAccessNurse(password, nurseId)
 
 	if err != nil {
 		return

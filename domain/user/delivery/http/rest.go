@@ -103,22 +103,10 @@ func (h *handlerUser) AccessNurse(c echo.Context) error {
 
 	nurseId := c.Param("userId")
 
-	nurseIdInt, err := strconv.Atoi(nurseId)
+	err = h.usecase.GiveAccessNurse(accessNurse.Password, nurseId)
 
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, "bad request")
-	}
-
-	err = utils.ValidateNIP(nurseIdInt, "NURSE")
-
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, "bad request")
-	}
-
-	err = h.usecase.GiveAccessNurse(accessNurse.Password, nurseIdInt)
-
-	if err != nil && err.Error() == "NIP not found" {
-		return c.JSON(http.StatusNotFound, "NIP not found")
+	if err != nil && err.Error() == "UserId not found / nip not nurse" {
+		return c.JSON(http.StatusNotFound, "UserId not found / nip not nurse")
 	}
 
 	if err != nil {
