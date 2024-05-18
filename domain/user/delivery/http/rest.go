@@ -67,6 +67,12 @@ func (h *handlerUser) Register(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, "bad request")
 	}
 
+	isImageTrue := utils.CheckImageType(req.IdentityCardScanImage)
+
+	if !isImageTrue {
+		return c.JSON(http.StatusBadRequest, "bad request")
+	}
+
 	data, err := h.usecase.Register(req)
 	if err != nil && err.Error() == "NIP already exist" {
 		return c.JSON(http.StatusConflict, map[string]string{"error": err.Error()})
