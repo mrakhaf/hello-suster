@@ -95,11 +95,7 @@ func (repo *repoHandler) GetPatients(req request.GetPatientsParam) (data []entit
 	}
 
 	if req.Limit != nil {
-		if *req.Limit > 5 {
-			query += fmt.Sprintf(" LIMIT %d", *req.Limit)
-		} else {
-			query += fmt.Sprintf(" LIMIT 5")
-		}
+		query += fmt.Sprintf(" LIMIT %d", *req.Limit)
 	} else {
 		query += fmt.Sprintf(" LIMIT 5")
 	}
@@ -123,7 +119,7 @@ func (repo *repoHandler) GetPatients(req request.GetPatientsParam) (data []entit
 	patients := entity.Patient{}
 
 	for rows.Next() {
-		err = rows.Scan(&patients.ID, &patients.IdentityNumber, &patients.Name, &patients.Gender, &patients.BirthDate, &patients.PhoneNumber, &patients.IdentityCardScanImg, &patients.CreatedAt)
+		err = rows.Scan(&patients.ID, &patients.IdentityNumber, &patients.Name, &patients.PhoneNumber, &patients.BirthDate, &patients.Gender, &patients.IdentityCardScanImg, &patients.CreatedAt)
 		data = append(data, patients)
 	}
 
