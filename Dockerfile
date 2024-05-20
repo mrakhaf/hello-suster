@@ -15,4 +15,5 @@ COPY . .
 # Build the Go app
 RUN go build -o server ./app/main.go
 
+EXPOSE 8080
 ENTRYPOINT ["./server"]
