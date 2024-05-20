@@ -1,9 +1,17 @@
 package usecase
 
 import (
+	"bytes"
+	"context"
 	"errors"
+	"fmt"
+	"log"
+	"mime/multipart"
 	"strconv"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/mrakhaf/halo-suster/domain/user/interfaces"
 	"github.com/mrakhaf/halo-suster/models/request"
 	"github.com/mrakhaf/halo-suster/shared/common/jwt"
@@ -131,4 +139,36 @@ func (u *usecase) DeleteNurse(nurseId string) (err error) {
 
 	return
 
+}
+
+func (u *usecase) UploadImage(file multipart.File, fileHeader *multipart.FileHeader) error {
+
+	buf := bytes.NewBuffer(nil)
+	if _, err := buf.ReadFrom(file); err != nil {
+		return fmt.Errorf("failed to read file: %v", err)
+	}
+
+	fileType := fileHeader.Header.Get("Content-Type")
+
+	cfg, err := config.LoadDefaultConfig(context.TODO())
+	if err != nil {
+		log.Fatalf("failed to load configuration, %v", err)
+	}
+
+	svc := s3.NewFromConfig(cfg)
+
+	_, err = svc.PutObject(context.TODO(), &s3.PutObjectInput{
+		Bucket:        aws.String("projectsprint-bucket-public-read"),
+		Key:           aws.String(fileHeader.Filename),
+		ACL:           "public-read",
+		Body:          bytes.NewReader(buf.Bytes()),
+		ContentLength: aws.Int64(fileHeader.Size),
+		ContentType:   aws.String(fileType),
+	})
+
+	if err != nil {
+		log.Fatalf("failed to put object, %v", err)
+	}
+
+	return nil
 }

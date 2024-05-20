@@ -1,6 +1,8 @@
 package interfaces
 
 import (
+	"mime/multipart"
+
 	"github.com/mrakhaf/halo-suster/models/entity"
 	"github.com/mrakhaf/halo-suster/models/request"
 )
@@ -22,4 +24,5 @@ type Usecase interface {
 	GetUsers(req request.GetUsers) (data interface{}, err error)
 	UpdateNurse(req request.EditNurse, nurseId string) (err error)
 	DeleteNurse(nip string) (err error)
+	UploadImage(src multipart.File, fileHeader *multipart.FileHeader) (err error)
 }
