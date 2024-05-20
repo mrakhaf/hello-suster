@@ -34,6 +34,7 @@ func HandlerUser(privateRoute *echo.Group, publicRoute *echo.Group, usecase inte
 	privateRoute.GET("/user", handler.GetUsers)
 	privateRoute.PUT("/user/nurse/:userId", handler.EditNurse)
 	privateRoute.DELETE("/user/nurse/:userId", handler.DeleteNurse)
+	privateRoute.POST("/image", handler.UploadImage)
 
 }
 
@@ -265,4 +266,46 @@ func (h *handlerUser) DeleteNurse(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, "success")
 
+}
+
+func (h *handlerUser) UploadImage(c echo.Context) error {
+
+	_, err := h.jwtAccess.GetUserIdFromToken(c)
+
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, "Unauthorized")
+	}
+
+	file, err := c.FormFile("file")
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "bad request")
+	}
+
+	if file.Header.Get("Content-Type") != "image/jpeg" && file.Header.Get("Content-Type") != "image/jpg" {
+		return c.JSON(http.StatusBadRequest, "Invalid file format. Must be in JPEG or JPG format.")
+	}
+
+	// Validate file size
+	if file.Size > 2*1024*1024 {
+		return c.JSON(http.StatusBadRequest, "File size exceeds the limit. Maximum file size is 2MB.")
+	}
+
+	// Validate minimum file size
+	if file.Size < 10*1024 {
+		return c.JSON(http.StatusBadRequest, "File size is too small. Minimum file size is 10KB.")
+	}
+
+	src, err := file.Open()
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "bad request")
+	}
+	defer src.Close()
+
+	bucket := h.usecase.UploadImage(src, file)
+
+	if bucket != nil {
+		return c.JSON(http.StatusInternalServerError, "failed to upload image")
+	}
+
+	return c.JSON(http.StatusOK, "success")
 }
