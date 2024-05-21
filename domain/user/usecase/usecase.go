@@ -8,10 +8,16 @@ import (
 	"log"
 	"mime/multipart"
 	"strconv"
+	"time"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
+	awsv2 "github.com/aws/aws-sdk-go-v2/aws"
+
+	v2 "github.com/aws/aws-sdk-go-v2/service/s3"
+
 	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/mrakhaf/halo-suster/domain/user/interfaces"
 	"github.com/mrakhaf/halo-suster/models/request"
 	"github.com/mrakhaf/halo-suster/shared/common/jwt"
@@ -141,34 +147,61 @@ func (u *usecase) DeleteNurse(nurseId string) (err error) {
 
 }
 
-func (u *usecase) UploadImage(file multipart.File, fileHeader *multipart.FileHeader) error {
+func (u *usecase) UploadImage(file multipart.File, fileHeader *multipart.FileHeader) (url string, err error) {
 
 	buf := bytes.NewBuffer(nil)
 	if _, err := buf.ReadFrom(file); err != nil {
-		return fmt.Errorf("failed to read file: %v", err)
+		return "", fmt.Errorf("failed to read file: %v", err)
 	}
 
 	fileType := fileHeader.Header.Get("Content-Type")
+
+	key := utils.GenerateUUID()
+	key += ".jpg"
 
 	cfg, err := config.LoadDefaultConfig(context.TODO())
 	if err != nil {
 		log.Fatalf("failed to load configuration, %v", err)
 	}
 
-	svc := s3.NewFromConfig(cfg)
+	svc := v2.NewFromConfig(cfg)
 
-	_, err = svc.PutObject(context.TODO(), &s3.PutObjectInput{
-		Bucket:        aws.String("projectsprint-bucket-public-read"),
-		Key:           aws.String(fileHeader.Filename),
+	_, err = svc.PutObject(context.TODO(), &v2.PutObjectInput{
+		Bucket:        awsv2.String("projectsprint-bucket-public-read"),
+		Key:           awsv2.String(key),
 		ACL:           "public-read",
 		Body:          bytes.NewReader(buf.Bytes()),
-		ContentLength: aws.Int64(fileHeader.Size),
-		ContentType:   aws.String(fileType),
+		ContentLength: awsv2.Int64(fileHeader.Size),
+		ContentType:   awsv2.String(fileType),
 	})
 
 	if err != nil {
 		log.Fatalf("failed to put object, %v", err)
 	}
 
-	return nil
+	sess, err := session.NewSession(&aws.Config{
+		Region: aws.String("ap-southeast-1")},
+	)
+
+	if err != nil {
+		log.Fatalf("failed to create session, %v", err)
+	}
+
+	// Create S3 service client
+	client := s3.New(sess)
+
+	urlBucket, _ := client.GetObjectRequest(&s3.GetObjectInput{
+		Bucket: aws.String("projectsprint-bucket-public-read"),
+		Key:    aws.String(key),
+	})
+
+	urlStr, err := urlBucket.Presign(15 * time.Minute)
+
+	if err != nil {
+		log.Println("Failed to sign request", err)
+	}
+
+	url = urlStr
+
+	return
 }
