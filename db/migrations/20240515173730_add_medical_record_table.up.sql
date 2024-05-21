@@ -4,5 +4,5 @@ CREATE TABLE medical_record (
   symptoms TEXT NOT NULL,
   medications TEXT NOT NULL,
   createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (identityNumber) REFERENCES patient(identitynumber)
+  FOREIGN KEY (identityNumber) REFERENCES patient(identitynumber) ON UPDATE CASCADE ON DELETE CASCADE
 );

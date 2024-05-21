@@ -24,5 +24,5 @@ type Usecase interface {
 	GetUsers(req request.GetUsers) (data interface{}, err error)
 	UpdateNurse(req request.EditNurse, nurseId string) (err error)
 	DeleteNurse(nip string) (err error)
-	UploadImage(src multipart.File, fileHeader *multipart.FileHeader) (err error)
+	UploadImage(src multipart.File, fileHeader *multipart.FileHeader) (url string, err error)
 }

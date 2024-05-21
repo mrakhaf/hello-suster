@@ -301,11 +301,15 @@ func (h *handlerUser) UploadImage(c echo.Context) error {
 	}
 	defer src.Close()
 
-	bucket := h.usecase.UploadImage(src, file)
+	bucket, err := h.usecase.UploadImage(src, file)
 
-	if bucket != nil {
+	fmt.Println(bucket)
+
+	if err != nil {
 		return c.JSON(http.StatusInternalServerError, "failed to upload image")
 	}
 
-	return c.JSON(http.StatusOK, "success")
+	return h.formatResponse.FormatJson(c, http.StatusOK, "success", map[string]interface{}{
+		"imageUrl": bucket,
+	})
 }
