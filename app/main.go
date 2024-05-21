@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"os"
 
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
@@ -77,5 +76,5 @@ func main() {
 	medicalRecordUsecase := medicalRecordUsecase.NewUsecase(medicalRecordRepo, jwtAccess)
 	medicalRecordHandler.HandlerMedicalRecord(restrictedGroup, publicRoute, medicalRecordUsecase, medicalRecordRepo, formatResponse, jwtAccess)
 
-	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", os.Getenv("APP_PORT"))))
+	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", 8080)))
 }
