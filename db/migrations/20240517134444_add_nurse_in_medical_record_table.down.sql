@@ -1,1 +1,1 @@
-ALTER TABLE medical_record DROP COLUMN IF EXISTS userId;
+ALTER TABLE medical_record DROP COLUMN IF EXISTS nip;
