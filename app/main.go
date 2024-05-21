@@ -76,5 +76,5 @@ func main() {
 	medicalRecordUsecase := medicalRecordUsecase.NewUsecase(medicalRecordRepo, jwtAccess)
 	medicalRecordHandler.HandlerMedicalRecord(restrictedGroup, publicRoute, medicalRecordUsecase, medicalRecordRepo, formatResponse, jwtAccess)
 
-	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", 3000)))
+	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", 8080)))
 }
