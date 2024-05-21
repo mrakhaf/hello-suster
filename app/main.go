@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	authHandler "github.com/mrakhaf/halo-suster/domain/auth/delivery/http"
@@ -29,11 +28,6 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Validator = common.NewValidator()
-
-	err := godotenv.Load(".env")
-	if err != nil {
-		e.Logger.Fatal(err)
-	}
 
 	//db config
 	database, err := database.ConnectDB()
